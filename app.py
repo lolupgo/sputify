@@ -45,14 +45,25 @@ def search():
 def stream(video_id):
     ydl_opts = {
         'quiet': True,
-        'format': 'bestaudio/best',
+        'format': 'bestaudio[ext=m4a]/bestaudio/best',
+        'noplaylist': True,
+        'default_search': 'ytsearch',
     }
 
-    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-        info = ydl.extract_info(f'https://www.youtube.com/watch?v={video_id}', download=False)
-        audio_url = info['url']
+    try:
+        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+            info = ydl.extract_info(f'https://www.youtube.com/watch?v={video_id}', download=False)
+            audio_url = info.get('url')
 
-    return jsonify({'url': audio_url})
+        if not audio_url:
+            return jsonify({'error': 'Unable to extract audio URL'}), 500
+
+        return jsonify({'url': audio_url})
+
+    except Exception as e:
+        print(f"[ERROR] Stream fetch failed: {e}")
+        return jsonify({'error': 'Stream failed'}), 500
+
 
 if __name__ == '__main__':
     # Run on all IPs to support mobile on same WiFi
