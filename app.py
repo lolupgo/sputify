@@ -1,8 +1,9 @@
 
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, Response
 from flask_cors import CORS
 import yt_dlp
 import socket
+import requests
 
 app = Flask(__name__)
 CORS(app)
@@ -61,11 +62,16 @@ def stream(video_id):
 
         if not audio_url:
             return jsonify({'error': 'Unable to extract audio URL'}), 500
+        def generate():
+            with requests.get(audio_url, stream=True) as r:
+                for chunk in r.iter_content(chunk_size=8192):
+                    if chunk:
+                        yield chunk
 
-        return jsonify({'url': audio_url})
+        return Response(generate(), content_type='audio/mpeg')
 
     except Exception as e:
-        print(f"[ERROR] Stream fetch failed: {e}")
+        print(f"[ERROR] Proxy stream failed: {e}")
         return jsonify({'error': 'Stream failed'}), 500
 
 
