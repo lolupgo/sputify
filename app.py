@@ -48,6 +48,10 @@ def stream(video_id):
         'format': 'bestaudio[ext=m4a]/bestaudio/best',
         'noplaylist': True,
         'default_search': 'ytsearch',
+        'http_headers': {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+        'Accept-Language': 'en-US,en;q=0.9',
+         }
     }
 
     try:
