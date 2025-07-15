@@ -1,0 +1,4 @@
+flask
+yt_dlp
+flask_cors
+ngrok http 5000
